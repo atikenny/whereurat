@@ -1,13 +1,15 @@
-var whereURAt = (function () {
-    var bar,
-        barId = 'whereURAt-bar',
-        _config = {
-            barColor: '#298AD9',
-            barHeight: '2px',
-            animate: true,
-            animationSpeed: 0.1,
-            zIndex: '999999'
-        };
+var whereURAtUtils = (function () {
+    'use strict';
+
+    function addEventListener(element, eventName, handler) {
+        if (element.addEventListener) {
+            element.addEventListener(eventName, handler);
+        } else {
+            element.attachEvent('on' + eventName, function () {
+                handler.call(element);
+            });
+        }
+    }
 
     function extend(target, extender) {
         for (var key in extender) {
@@ -17,8 +19,27 @@ var whereURAt = (function () {
         }
     }
 
+    return {
+        extend: extend,
+        addEventListener: addEventListener
+    };
+}());
+
+var whereURAt = (function (utilityService) {
+    'use strict';
+
+    var bar,
+        _config = {
+            barId: 'whereURAt-bar',
+            barColor: '#298AD9',
+            barHeight: '2px',
+            animate: true,
+            animationSpeed: 0.1,
+            zIndex: '999999'
+        };
+
     function add(config) {
-        extend(_config, config);
+        utilityService.extend(_config, config);
         clearBar();
         addBar();
         addBarStyle();
@@ -27,12 +48,12 @@ var whereURAt = (function () {
     }
 
     function addBar() {
-        document.body.insertAdjacentHTML('afterbegin', '<div id="' + barId + '"></div>');
-        bar = document.getElementById(barId);
+        document.body.insertAdjacentHTML('afterbegin', '<div id="' + _config.barId + '"></div>');
+        bar = document.getElementById(_config.barId);
     }
 
     function clearBar() {
-        var bar = document.getElementById(barId);
+        var bar = document.getElementById(_config.barId);
 
         if (bar) {
             document.removeEventListener('scroll', adjustWidth);
@@ -62,18 +83,8 @@ var whereURAt = (function () {
     }
 
     function addWidthAdjustHandler() {
-        addEventListener(document, 'scroll', adjustWidth);
-        addEventListener(document, 'resize', adjustWidth);
-    }
-
-    function addEventListener(element, eventName, handler) {
-        if (element.addEventListener) {
-            element.addEventListener(eventName, handler);
-        } else {
-            element.attachEvent('on' + eventName, function () {
-                handler.call(element);
-            });
-        }
+        utilityService.addEventListener(document, 'scroll', adjustWidth);
+        utilityService.addEventListener(document, 'resize', adjustWidth);
     }
 
     function adjustWidth() {
@@ -85,4 +96,4 @@ var whereURAt = (function () {
     return {
         add: add
     };
-}());
+}(whereURAtUtils));
